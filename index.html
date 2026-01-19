@@ -27,7 +27,7 @@
         }
 
         header {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             padding-bottom: 10px;
             border-bottom: 1px solid #333;
             display: flex;
@@ -43,6 +43,7 @@
             font-weight: 800;
             letter-spacing: 1px;
             margin: 0;
+            font-variant: small-caps;
         }
 
         #weather {
@@ -145,10 +146,10 @@
                             <span class="time-ago">${diffMins}m ago</span>
                         `;
                     } else {
-                        weatherEl.innerText = "No Temp Data";
+                        weatherEl.innerText = "--°";
                     }
                 } else {
-                    weatherEl.innerText = "";
+                    weatherEl.innerText = "--°";
                 }
             })
             .catch(error => {
