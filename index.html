@@ -49,6 +49,15 @@
             color: var(--brand-orange);
             font-size: 20px;
             font-weight: 600;
+            text-align: right;
+        }
+
+        .time-ago {
+            font-size: 14px;
+            opacity: 0.7;
+            font-weight: 400;
+            margin-left: 5px;
+            color: #aaa;
         }
 
         .camera-grid {
@@ -102,7 +111,7 @@
 <div class="container">
     <header>
         <h1 class="pageTitle">Mazama Cameras</h1>
-        <div id="weather"></div>
+        <div id="weather">Loading...</div>
     </header>
 
     <div class="camera-grid" id="camera-container"></div>
@@ -110,28 +119,34 @@
 
 <script>
     function updateWeather() {
-        const stationId = 'MAZ22';
+        const token = '51e93f9297c546888b92d911793303fa';
+        const stationId = 'C6697';
         const weatherEl = document.getElementById('weather');
 
-        fetch(`https://api.weather.gov/stations/${stationId}/observations/latest`)
+        const url = `https://api.synopticdata.com/v2/stations/latest?stid=${stationId}&token=${token}&units=english`;
+
+        fetch(url)
             .then(response => response.json())
             .then(data => {
-                const props = data.properties;
-                const tempC = props.temperature.value;
-                
-                // Return early if no temp data
-                if (tempC === null) {
-                    weatherEl.innerText = "";
-                    return;
-                }
+                if (data.STATION && data.STATION.length > 0) {
+                    const station = data.STATION[0];
+                    const obs = station.OBSERVATIONS;
 
-                const timestamp = new Date(props.timestamp);
-                const diffMins = Math.floor((new Date() - timestamp) / 60000);
+                    if (obs.air_temp_value_1) {
+                        const tempF = obs.air_temp_value_1.value;
+                        const lastUpdatedStr = obs.air_temp_value_1.date_time;
 
-                // Only show if updated in the last 90 minutes
-                if (diffMins <= 90) {
-                    const tempF = (tempC * 9/5) + 32;
-                    weatherEl.innerHTML = `${tempF.toFixed(0)}°`;
+                        const timestamp = new Date(lastUpdatedStr);
+                        const now = new Date();
+                        const diffMins = Math.floor((now - timestamp) / 60000);
+
+                        weatherEl.innerHTML = `
+                            ${Math.round(tempF)}°
+                            <span class="time-ago">${diffMins}m ago</span>
+                        `;
+                    } else {
+                        weatherEl.innerText = "No Temp Data";
+                    }
                 } else {
                     weatherEl.innerText = "";
                 }
