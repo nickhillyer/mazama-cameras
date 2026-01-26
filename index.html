@@ -32,7 +32,6 @@
             border-bottom: 1px solid #333;
             display: flex;
             justify-content: space-between;
-            /* Changed to flex-end to align bottoms of text */
             align-items: flex-end; 
             flex-wrap: wrap;
             gap: 10px;
@@ -45,7 +44,6 @@
             letter-spacing: 1px;
             margin: 0;
             font-variant: small-caps;
-            /* Ensure line-height doesn't add extra bottom space */
             line-height: 1;
         }
 
@@ -54,8 +52,14 @@
             font-size: 20px;
             font-weight: 600;
             text-align: right;
-            /* Ensure line-height matches title behavior for alignment */
             line-height: 1;
+        }
+
+        #weather-age {
+            color: #aaa;
+            font-size: 10px;
+            opacity: 0.8;
+            margin-left: 5px;
         }
 
         .camera-grid {
@@ -119,34 +123,47 @@
 <script>
     function updateWeather() {
         const token = '51e93f9297c546888b92d911793303fa';
-        // C6697 is closer than G3555
-        const stationId = 'C6697';
+        const stations = ['C6697', 'G3555', 'MAZ22'];
         const weatherEl = document.getElementById('weather');
 
-        const url = `https://api.synopticdata.com/v2/stations/latest?stid=${stationId}&token=${token}&units=english`;
+        const url = `https://api.synopticdata.com/v2/stations/latest?stid=${stations.join(',')}&token=${token}&units=english`;
 
         fetch(url)
             .then(response => response.json())
             .then(data => {
                 if (data.STATION && data.STATION.length > 0) {
-                    const station = data.STATION[0];
-                    const obs = station.OBSERVATIONS;
-
-                    if (obs && obs.air_temp_value_1) {
-                        const tempF = obs.air_temp_value_1.value;
-                        const lastUpdatedStr = obs.air_temp_value_1.date_time;
-
-                        const timestamp = new Date(lastUpdatedStr);
-                        const now = new Date();
-                        const diffMins = Math.floor((now - timestamp) / 60000);
-
-                        // If data is older than 60 minutes, show --°
-                        if (diffMins > 60) {
-                            weatherEl.innerText = "--°";
-                        } else {
-                            // Only show the rounded temperature
-                            weatherEl.innerText = `${Math.round(tempF)}°`;
+                    let results = {};
+                    
+                    data.STATION.forEach(station => {
+                        const obs = station.OBSERVATIONS;
+                        if (obs && obs.air_temp_value_1) {
+                            const timestamp = new Date(obs.air_temp_value_1.date_time);
+                            const diffMins = Math.floor((new Date() - timestamp) / 60000);
+                            results[station.STID] = {
+                                temp: Math.round(obs.air_temp_value_1.value),
+                                age: diffMins
+                            };
                         }
+                    });
+
+                    let selected = null;
+
+                    // Logic: Use C6697 if it exists and is less than 60 mins old
+                    if (results['C6697'] && results['C6697'].age <= 60) {
+                        selected = results['C6697'];
+                    } else {
+                        // Otherwise, find the station with the most recent update (lowest age)
+                        let newestAge = Infinity;
+                        for (const id in results) {
+                            if (results[id].age < newestAge) {
+                                newestAge = results[id].age;
+                                selected = results[id];
+                            }
+                        }
+                    }
+
+                    if (selected) {
+                        weatherEl.innerHTML = `${selected.temp}°<span id="weather-age">${selected.age}m ago</span>`;
                     } else {
                         weatherEl.innerText = "--°";
                     }
