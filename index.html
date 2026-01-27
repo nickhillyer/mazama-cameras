@@ -32,14 +32,15 @@
             border-bottom: 1px solid #333;
             display: flex;
             justify-content: space-between;
-            align-items: flex-end; 
+            /* Changed to baseline for better text alignment */
+            align-items: baseline; 
             flex-wrap: wrap;
             gap: 10px;
         }
 
         .pageTitle {
             color: var(--brand-orange);
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 800;
             letter-spacing: 1px;
             margin: 0;
@@ -62,49 +63,46 @@
             margin-left: 5px;
         }
 
+        /* Switched to Grid: Cleaner than Flexbox + Calc */
         .camera-grid {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: 1fr;
             gap: 20px;
         }
 
         .cam-link {
             text-decoration: none;
-            width: 100%;
             display: block;
         }
 
         .cam-label {
-            padding: 0 0 4px 0;
+            padding-bottom: 4px; /* Simplified from 4-value padding */
             color: #aaa;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
             letter-spacing: 0.5px;
         }
 
         .img-wrapper {
             background: #000;
-            line-height: 0;
-            border-radius: 4px;
-            overflow: hidden;
+            /* line-height: 0 removed; handled by img display: block */
         }
 
         .cam-link img {
             width: 100%;
-            height: auto;
             display: block;
-            object-fit: contain;
         }
 
         @media (min-width: 700px) {
+            .camera-grid {
+                grid-template-columns: 1fr 1fr; /* 2 Column layout */
+            }
+
+            /* First 3 cameras take full width */
             .cam-link:nth-child(1),
             .cam-link:nth-child(2),
             .cam-link:nth-child(3) {
-                width: 100%;
-            }
-
-            .cam-link:nth-child(n+4) {
-                width: calc(50% - 15px);
+                grid-column: span 2;
             }
         }
     </style>
@@ -147,12 +145,9 @@
                     });
 
                     let selected = null;
-
-                    // Logic: Use C6697 if it exists and is less than 60 mins old
                     if (results['C6697'] && results['C6697'].age <= 60) {
                         selected = results['C6697'];
                     } else {
-                        // Otherwise, find the station with the most recent update (lowest age)
                         let newestAge = Infinity;
                         for (const id in results) {
                             if (results[id].age < newestAge) {
