@@ -32,7 +32,6 @@
             border-bottom: 1px solid #333;
             display: flex;
             justify-content: space-between;
-            /* Changed to baseline for better text alignment */
             align-items: baseline; 
             flex-wrap: wrap;
             gap: 10px;
@@ -49,11 +48,17 @@
         }
 
         #weather {
-            color: var(--brand-orange);
             font-size: 20px;
             font-weight: 600;
             text-align: right;
             line-height: 1;
+        }
+
+        /* Makes the weather link look like regular text */
+        #weather a {
+            color: var(--brand-orange);
+            text-decoration: none;
+            cursor: pointer;
         }
 
         #weather-age {
@@ -63,7 +68,6 @@
             margin-left: 5px;
         }
 
-        /* Switched to Grid: Cleaner than Flexbox + Calc */
         .camera-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -76,7 +80,7 @@
         }
 
         .cam-label {
-            padding-bottom: 4px; /* Simplified from 4-value padding */
+            padding-bottom: 4px;
             color: #aaa;
             font-size: 16px;
             font-weight: 700;
@@ -85,7 +89,6 @@
 
         .img-wrapper {
             background: #000;
-            /* line-height: 0 removed; handled by img display: block */
         }
 
         .cam-link img {
@@ -95,10 +98,9 @@
 
         @media (min-width: 700px) {
             .camera-grid {
-                grid-template-columns: 1fr 1fr; /* 2 Column layout */
+                grid-template-columns: 1fr 1fr;
             }
 
-            /* First 3 cameras take full width */
             .cam-link:nth-child(1),
             .cam-link:nth-child(2),
             .cam-link:nth-child(3) {
@@ -138,6 +140,7 @@
                             const timestamp = new Date(obs.air_temp_value_1.date_time);
                             const diffMins = Math.floor((new Date() - timestamp) / 60000);
                             results[station.STID] = {
+                                stid: station.STID,
                                 temp: Math.round(obs.air_temp_value_1.value),
                                 age: diffMins
                             };
@@ -158,7 +161,9 @@
                     }
 
                     if (selected) {
-                        weatherEl.innerHTML = `${selected.temp}°<span id="weather-age">${selected.age}m ago</span>`;
+                        // Links the temperature to the specific station currently being shown
+                        const synopticUrl = `https://viewer.synopticdata.com/table/${selected.stid}/basic-weather/now`;
+                        weatherEl.innerHTML = `<a href="${synopticUrl}" target="_blank">${selected.temp}°</a><span id="weather-age">${selected.age}m ago</span>`;
                     } else {
                         weatherEl.innerText = "--°";
                     }
