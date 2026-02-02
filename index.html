@@ -54,7 +54,7 @@
             line-height: 1;
         }
 
-        /* Makes the weather link look like regular text */
+        /* Style for the temp link */
         #weather a {
             color: var(--brand-orange);
             text-decoration: none;
@@ -128,6 +128,11 @@
 
         const url = `https://api.synopticdata.com/v2/stations/latest?stid=${stations.join(',')}&token=${token}&units=english`;
 
+        // Function to show "--°" linked to the raw API for debugging
+        const setErrorLink = () => {
+            weatherEl.innerHTML = `<a href="${url}" target="_blank">--°</a>`;
+        };
+
         fetch(url)
             .then(response => response.json())
             .then(data => {
@@ -148,9 +153,11 @@
                     });
 
                     let selected = null;
+                    // Prefer C6697 if it's fresh (under 60 mins)
                     if (results['C6697'] && results['C6697'].age <= 60) {
                         selected = results['C6697'];
                     } else {
+                        // Otherwise take the most recent update available
                         let newestAge = Infinity;
                         for (const id in results) {
                             if (results[id].age < newestAge) {
@@ -161,19 +168,18 @@
                     }
 
                     if (selected) {
-                        // Links the temperature to the specific station currently being shown
                         const synopticUrl = `https://viewer.synopticdata.com/table/${selected.stid}/basic-weather/now`;
                         weatherEl.innerHTML = `<a href="${synopticUrl}" target="_blank">${selected.temp}°</a><span id="weather-age">${selected.age}m ago</span>`;
                     } else {
-                        weatherEl.innerText = "--°";
+                        setErrorLink();
                     }
                 } else {
-                    weatherEl.innerText = "--°";
+                    setErrorLink();
                 }
             })
             .catch(error => {
                 console.error('Weather load failed:', error);
-                weatherEl.innerText = "--°";
+                setErrorLink();
             });
     }
 
