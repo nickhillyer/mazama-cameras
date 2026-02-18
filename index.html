@@ -47,6 +47,7 @@
             line-height: 1;
         }
 
+        /*
         #weather {
             font-size: 20px;
             font-weight: 600;
@@ -54,7 +55,7 @@
             line-height: 1;
         }
 
-        /* Style for the temp link */
+        Style for the temp link
         #weather a {
             color: var(--brand-orange);
             text-decoration: none;
@@ -67,6 +68,7 @@
             opacity: 0.8;
             margin-left: 5px;
         }
+        */
 
         .camera-grid {
             display: grid;
@@ -114,13 +116,14 @@
 <div class="container">
     <header>
         <h1 class="pageTitle">Mazama Cameras</h1>
-        <div id="weather">--°</div>
+        <!-- <div id="weather">--°</div> -->
     </header>
 
     <div class="camera-grid" id="camera-container"></div>
 </div>
 
 <script>
+    /*
     function updateWeather() {
         const token = 'b690969acc904db599e82c119551fdad';
         const stations = ['C6697', 'G3555', 'MAZ22'];
@@ -182,6 +185,7 @@
                 setErrorLink();
             });
     }
+    */
 
     const cameras = [
         { name: "Mazama Ranch House", url: "https://mazamaranchhouse.com/webcam", img: "https://mazamacam.earthandskystudios.com/content/ranchhouseimg.jpg" },
@@ -212,7 +216,7 @@
         container.appendChild(link);
     });
 
-    updateWeather();
+    // updateWeather();
 </script>
 
 </body>
