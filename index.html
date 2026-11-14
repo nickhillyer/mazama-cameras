@@ -47,29 +47,6 @@
             line-height: 1;
         }
 
-        /*
-        #weather {
-            font-size: 20px;
-            font-weight: 600;
-            text-align: right;
-            line-height: 1;
-        }
-
-        Style for the temp link
-        #weather a {
-            color: var(--brand-orange);
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        #weather-age {
-            color: #aaa;
-            font-size: 10px;
-            opacity: 0.8;
-            margin-left: 5px;
-        }
-        */
-
         .camera-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -115,76 +92,12 @@
 <div class="container">
     <header>
         <h1 class="pageTitle">Mazama Cameras</h1>
-        <!-- <div id="weather">--°</div> -->
     </header>
 
     <div class="camera-grid" id="camera-container"></div>
 </div>
 
 <script>
-    /*
-    function updateWeather() {
-        const token = 'b690969acc904db599e82c119551fdad';
-        const stations = ['C6697', 'G3555', 'MAZ22'];
-        const weatherEl = document.getElementById('weather');
-
-        const url = `https://api.synopticdata.com/v2/stations/latest?stid=${stations.join(',')}&token=${token}&units=english`;
-
-        // Function to show "--°" linked to the raw API for debugging
-        const setErrorLink = () => {
-            weatherEl.innerHTML = `<a href="${url}" target="_blank">--°</a>`;
-        };
-
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                if (data.STATION && data.STATION.length > 0) {
-                    let results = {};
-                    
-                    data.STATION.forEach(station => {
-                        const obs = station.OBSERVATIONS;
-                        if (obs && obs.air_temp_value_1) {
-                            const timestamp = new Date(obs.air_temp_value_1.date_time);
-                            const diffMins = Math.floor((new Date() - timestamp) / 60000);
-                            results[station.STID] = {
-                                stid: station.STID,
-                                temp: Math.round(obs.air_temp_value_1.value),
-                                age: diffMins
-                            };
-                        }
-                    });
-
-                    let selected = null;
-                    // Prefer C6697 if it's fresh (under 60 mins)
-                    if (results['C6697'] && results['C6697'].age <= 60) {
-                        selected = results['C6697'];
-                    } else {
-                        // Otherwise take the most recent update available
-                        let newestAge = Infinity;
-                        for (const id in results) {
-                            if (results[id].age < newestAge) {
-                                newestAge = results[id].age;
-                                selected = results[id];
-                            }
-                        }
-                    }
-
-                    if (selected) {
-                        const synopticUrl = `https://viewer.synopticdata.com/table/${selected.stid}/basic-weather/now`;
-                        weatherEl.innerHTML = `<a href="${synopticUrl}" target="_blank">${selected.temp}°</a><span id="weather-age">${selected.age}m ago</span>`;
-                    } else {
-                        setErrorLink();
-                    }
-                } else {
-                    setErrorLink();
-                }
-            })
-            .catch(error => {
-                console.error('Weather load failed:', error);
-                setErrorLink();
-            });
-    }
-    */
 
     const cameras = [
         //{ name: "Mazama Ranch House", url: "https://mazamaranchhouse.com/webcam", img: "https://mazamacam.earthandskystudios.com/content/ranchhouseimg.jpg" },
@@ -215,7 +128,6 @@
         container.appendChild(link);
     });
 
-    // updateWeather();
 </script>
 
 </body>
