@@ -58,6 +58,10 @@
             display: block;
         }
 
+        .cam-link[hidden] {
+            display: none;
+        }
+
         .cam-label {
             padding-bottom: 4px;
             color: #aaa;
@@ -80,7 +84,7 @@
                 grid-template-columns: 1fr 1fr;
             }
 
-            .cam-link:nth-child(1) {
+            .cam-link.full-width {
                 grid-column: span 2;
             }
         }
@@ -98,33 +102,51 @@
 
 <script>
 
+    // Set width to "full" or "half" for the two-column desktop layout.
     const cameras = [
-        //{ name: "Mazama Ranch House", url: "https://mazamaranchhouse.com/webcam", img: "https://mazamacam.earthandskystudios.com/content/ranchhouseimg.jpg" },
-        { name: "Sun Mountain", url: "https://sunmountainlodge.com/webcam", img: "https://sunmountainlodge.com/wp-content/uploads/webcam/smlcam.jpg" },
-        //{ name: "Edelweiss", url: "http://highlandmeadow.homelinux.org", img: "https://wsrv.nl/?url=highlandmeadow.homelinux.org" },
-        //{ name: "Mazama Snow Stake", url: "https://stake-images.sfo3.digitaloceanspaces.com/mazama/latest/stake_image.jpg", img: "https://stake-images.sfo3.digitaloceanspaces.com/mazama/latest/stake_image.jpg" },
-        { name: "Winthrop", url: "https://wsdot.com/travel/real-time/mountainpasses/north-cascade-hwy", img: "https://images.wsdot.wa.gov/nc/020vc19255.jpg" },
-        { name: "Loup Loup Pass", url: "https://wsdot.com/travel/real-time/mountainpasses/Loup-Loup", img: "https://images.wsdot.wa.gov/nc/020vc21450.jpg" },
-        { name: "Snoqualmie Pass", url: "https://wsdot.com/travel/real-time/mountainpasses/Snoqualmie", img: "https://images.wsdot.wa.gov/sc/090VC05200.jpg" },
-        { name: "Stevens Pass", url: "https://wsdot.com/travel/real-time/mountainpasses/Stevens", img: "https://images.wsdot.wa.gov/nc/002vc06458.jpg" },
-        { name: "Blewett Pass", url: "https://wsdot.com/travel/real-time/mountainpasses/Blewett", img: "https://images.wsdot.wa.gov/nc/097vc16375.jpg" }
+        { name: "Mazama Ranch House", url: "https://mazamaranchhouse.com/webcam", img: "https://mazamacam.earthandskystudios.com/content/ranchhouseimg.jpg", width: "full" },
+        { name: "Sun Mountain", url: "https://sunmountainlodge.com/webcam", img: "https://sunmountainlodge.com/wp-content/uploads/webcam/smlcam.jpg", width: "full" },
+        //{ name: "Edelweiss", url: "http://highlandmeadow.homelinux.org", img: "https://wsrv.nl/?url=highlandmeadow.homelinux.org", width: "half" },
+        //{ name: "Mazama Snow Stake", url: "https://stake-images.sfo3.digitaloceanspaces.com/mazama/latest/stake_image.jpg", img: "https://stake-images.sfo3.digitaloceanspaces.com/mazama/latest/stake_image.jpg", width: "half" },
+        { name: "Winthrop", url: "https://wsdot.com/travel/real-time/mountainpasses/north-cascade-hwy", img: "https://images.wsdot.wa.gov/nc/020vc19255.jpg", width: "half" },
+        { name: "Loup Loup Pass", url: "https://wsdot.com/travel/real-time/mountainpasses/Loup-Loup", img: "https://images.wsdot.wa.gov/nc/020vc21450.jpg", width: "half" },
+        { name: "Snoqualmie Pass", url: "https://wsdot.com/travel/real-time/mountainpasses/Snoqualmie", img: "https://images.wsdot.wa.gov/sc/090VC05200.jpg", width: "half" },
+        { name: "Stevens Pass", url: "https://wsdot.com/travel/real-time/mountainpasses/Stevens", img: "https://images.wsdot.wa.gov/nc/002vc06458.jpg", width: "half" },
+        { name: "Blewett Pass", url: "https://wsdot.com/travel/real-time/mountainpasses/Blewett", img: "https://images.wsdot.wa.gov/nc/097vc16375.jpg", width: "half" }
     ];
 
     const container = document.getElementById('camera-container');
-    const cacheBuster = "?" + Date.now();
+    const cacheBuster = Date.now();
 
     cameras.forEach(cam => {
         const link = document.createElement('a');
         link.href = cam.url;
         link.target = "_blank";
-        link.className = 'cam-link';
-        link.innerHTML = `
-            <div class="cam-label">${cam.name}</div>
-            <div class="img-wrapper">
-                <img src="${cam.img}${cacheBuster}" alt="${cam.name}" loading="lazy">
-            </div>
-        `;
+        link.className = `cam-link ${cam.width === 'full' ? 'full-width' : 'half-width'}`;
+        link.hidden = true;
+
+        const label = document.createElement('div');
+        label.className = 'cam-label';
+        label.textContent = cam.name;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'img-wrapper';
+        const image = document.createElement('img');
+        image.alt = cam.name;
+        image.addEventListener('load', () => {
+            link.hidden = false;
+        });
+        image.addEventListener('error', () => {
+            link.hidden = true;
+        });
+        wrapper.appendChild(image);
+        link.append(label, wrapper);
         container.appendChild(link);
+
+        // Load hidden images eagerly so they can reveal their cards on success.
+        const imageUrl = new URL(cam.img);
+        imageUrl.searchParams.set('t', cacheBuster);
+        image.src = imageUrl.href;
     });
 
 </script>
